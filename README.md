@@ -7,7 +7,7 @@ A Flutter plugin for decoding images on Windows using the Windows Imaging Compon
 ## Features
 
 - Decode an image file to raw RGBA pixels via `decodeImageToRawPixelFile`.
-- Read the decoded image's EXIF/WIC orientation (`1`–`8`, defaults to `1`).
+- Read the decoded image's EXIF/XMP/WIC orientation (`1`–`8`, defaults to `1`).
 - Decode the resulting raw pixel file into a `dart:ui.Image` with `decodeRawPixelFileToUIImage`.
 - Display an image with orientation applied using `WicDecode.buildImageViewFromUIImage`.
 
@@ -38,7 +38,7 @@ WicDecode.buildImageViewFromUIImage(image, result.orientation);
 
 - `result.width` — output image width
 - `result.height` — output image height
-- `result.orientation` — EXIF orientation (1–8), defaults to 1
+- `result.orientation` — EXIF/XMP orientation (1–8), defaults to 1
 
 ## Platform support
 

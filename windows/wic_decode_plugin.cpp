@@ -14,6 +14,8 @@
 #include <propvarutil.h>
 #include <wrl/client.h>
 
+#include <cstdlib>
+
 #include <algorithm>
 #include <cmath>
 #include <filesystem>
@@ -112,44 +114,87 @@ bool DecodeImageToRawPixelFile(const std::string &srcImage, const std::string &d
     }
 
     int orientation = 1;
+    bool foundOrientation = false;
     {
       ComPtr<IWICMetadataQueryReader> metadataReader;
       if (SUCCEEDED(frame->GetMetadataQueryReader(&metadataReader)) &&
           metadataReader) {
-        PROPVARIANT value;
-        PropVariantInit(&value);
-        if (SUCCEEDED(metadataReader->GetMetadataByName(
-                L"System.Photo.Orientation", &value))) {
-          switch (value.vt) {
-            case VT_UI1:
-              orientation = value.bVal;
+        const wchar_t *candidatePaths[] = {
+            L"/ifd/{ushort=274}",
+            L"/app1/ifd/{ushort=274}",
+            L"/app1/ifd/exif/{ushort=274}",
+            L"/heifProps/Orientation",
+            L"System.Photo.Orientation",
+            L"/xmp/tiff:Orientation",
+            L"/xmp/exif:Orientation",
+            L"/xmp/exif/Orientation",
+        };
+        for (const wchar_t *path : candidatePaths) {
+          PROPVARIANT value;
+          PropVariantInit(&value);
+          if (SUCCEEDED(metadataReader->GetMetadataByName(path, &value))) {
+            int parsed = 0;
+            bool ok = false;
+            switch (value.vt) {
+              case VT_UI1:
+                parsed = value.bVal;
+                ok = true;
+                break;
+              case VT_I2:
+                parsed = value.iVal;
+                ok = true;
+                break;
+              case VT_UI2:
+                parsed = value.uiVal;
+                ok = true;
+                break;
+              case VT_I4:
+                parsed = value.lVal;
+                ok = true;
+                break;
+              case VT_UI4:
+                parsed = static_cast<int>(value.ulVal);
+                ok = true;
+                break;
+              case VT_INT:
+                parsed = value.intVal;
+                ok = true;
+                break;
+              case VT_UINT:
+                parsed = static_cast<int>(value.uintVal);
+                ok = true;
+                break;
+              case VT_LPWSTR:
+                if (value.pwszVal) {
+                  parsed = _wtoi(value.pwszVal);
+                  ok = true;
+                }
+                break;
+              case VT_BSTR:
+                if (value.bstrVal) {
+                  parsed = _wtoi(value.bstrVal);
+                  ok = true;
+                }
+                break;
+              case VT_LPSTR:
+                if (value.pszVal) {
+                  parsed = std::atoi(value.pszVal);
+                  ok = true;
+                }
+                break;
+              default:
+                break;
+            }
+            if (ok && parsed >= 1 && parsed <= 8) {
+              orientation = parsed;
+              foundOrientation = true;
+            }
+            PropVariantClear(&value);
+            if (foundOrientation) {
               break;
-            case VT_I2:
-              orientation = value.iVal;
-              break;
-            case VT_UI2:
-              orientation = value.uiVal;
-              break;
-            case VT_I4:
-              orientation = value.lVal;
-              break;
-            case VT_UI4:
-              orientation = static_cast<int>(value.ulVal);
-              break;
-            case VT_INT:
-              orientation = value.intVal;
-              break;
-            case VT_UINT:
-              orientation = static_cast<int>(value.uintVal);
-              break;
-            default:
-              break;
-          }
-          if (orientation < 1 || orientation > 8) {
-            orientation = 1;
+            }
           }
         }
-        PropVariantClear(&value);
       }
     }
 

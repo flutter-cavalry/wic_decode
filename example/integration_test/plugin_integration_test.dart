@@ -35,6 +35,34 @@ void writeBmp(File file, int width, int height) {
   file.writeAsBytesSync(bytes, flush: true);
 }
 
+void addOrientationTest(
+  String label,
+  String fileName,
+  int width,
+  int height,
+  int orientation,
+) {
+  testWidgets('orientation: $label', (WidgetTester tester) async {
+    final plugin = WicDecode();
+    final dataDir = Directory(
+      p.join(Directory.current.path, 'integration_test', 'data'),
+    );
+    final src = File(p.join(dataDir.path, fileName));
+    final dest = File(
+      p.join(Directory.systemTemp.path, 'wic_orient_$label.raw'),
+    );
+    expect(await src.exists(), isTrue);
+    final result = await plugin.decodeImageToRawPixelFile(
+      srcImage: src.path,
+      destFile: dest.path,
+    );
+    expect(result.width, width);
+    expect(result.height, height);
+    expect(result.orientation, orientation);
+  });
+}
+
+
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
@@ -158,5 +186,10 @@ void main() {
     expect(heightLimited.width, 2);
     expect(heightLimited.height, 1);
   });
-}
 
+  addOrientationTest('png', 'orient.png', 100, 70, 8);
+  addOrientationTest('jpg', 'orient.jpg', 100, 70, 8);
+  addOrientationTest('heic', 'orient.heic', 70, 100, 1);
+  addOrientationTest('avif', 'orient.avif', 70, 100, 1);
+  addOrientationTest('jxl', 'orient.jxl', 70, 100, 1);
+}
