@@ -10,14 +10,14 @@ class MethodChannelWicDecode extends WicDecodePlatform {
   final methodChannel = const MethodChannel('wic_decode');
 
   @override
-  Future<Map<String, dynamic>> decodeToFile({
+  Future<Map<String, dynamic>> decodeImageToRawPixelFile({
     required String srcImage,
     required String destFile,
     int? outWidth,
     int? outHeight,
   }) async {
     final result = await methodChannel.invokeMethod<Map<dynamic, dynamic>>(
-      'decodeToFile',
+      'decodeImageToRawPixelFile',
       <String, dynamic>{
         'srcImage': srcImage,
         'destFile': destFile,

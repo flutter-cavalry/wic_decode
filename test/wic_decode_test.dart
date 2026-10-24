@@ -8,7 +8,7 @@ class MockWicDecodePlatform
     with MockPlatformInterfaceMixin
     implements WicDecodePlatform {
   @override
-  Future<Map<String, dynamic>> decodeToFile({
+  Future<Map<String, dynamic>> decodeImageToRawPixelFile({
     required String srcImage,
     required String destFile,
     int? outWidth,
@@ -25,12 +25,12 @@ void main() {
     expect(initialPlatform, isInstanceOf<MethodChannelWicDecode>());
   });
 
-  test('decodeToFile', () async {
+  test('decodeImageToRawPixelFile', () async {
     WicDecode wicDecodePlugin = WicDecode();
     MockWicDecodePlatform fakePlatform = MockWicDecodePlatform();
     WicDecodePlatform.instance = fakePlatform;
 
-    await wicDecodePlugin.decodeToFile(
+    await wicDecodePlugin.decodeImageToRawPixelFile(
       srcImage: 'src',
       destFile: 'dest',
     );

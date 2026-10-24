@@ -21,8 +21,8 @@ void main() {
         .setMockMethodCallHandler(channel, null);
   });
 
-  test('decodeToFile', () async {
-    final result = await platform.decodeToFile(srcImage: 'src', destFile: 'dest');
+  test('decodeImageToRawPixelFile', () async {
+    final result = await platform.decodeImageToRawPixelFile(srcImage: 'src', destFile: 'dest');
     expect(result.width, 1);
     expect(result.height, 1);
     expect(result.orientation, 1);

@@ -8,13 +8,13 @@ import 'package:flutter/widgets.dart';
 import 'wic_decode_platform_interface.dart';
 
 class WicDecode {
-  Future<Map<String, dynamic>> decodeToFile({
+  Future<Map<String, dynamic>> decodeImageToRawPixelFile({
     required String srcImage,
     required String destFile,
     int? outWidth,
     int? outHeight,
   }) {
-    return WicDecodePlatform.instance.decodeToFile(
+    return WicDecodePlatform.instance.decodeImageToRawPixelFile(
       srcImage: srcImage,
       destFile: destFile,
       outWidth: outWidth,
@@ -22,13 +22,13 @@ class WicDecode {
     );
   }
 
-  /// Decodes a raw RGBA pixel file produced by [decodeToFile] into a [ui.Image].
-  Future<ui.Image> decodeWicRawPixelFile({
+  /// Decodes a raw RGBA pixel file produced by [decodeImageToRawPixelFile] into a [ui.Image].
+  Future<ui.Image> decodeRawPixelFileToUIImage({
     required String filePath,
     required int width,
     required int height,
   }) {
-    return _decodeWicRawPixelFile(
+    return _decodeRawPixelFileToUIImage(
       filePath: filePath,
       width: width,
       height: height,
@@ -36,7 +36,7 @@ class WicDecode {
   }
 
   /// Builds a widget that displays [image] with the EXIF [orientation] applied.
-  static Widget buildImageView(ui.Image image, [int orientation = 1]) {
+  static Widget buildImageViewFromUIImage(ui.Image image, [int orientation = 1]) {
     int quarterTurns = 0;
     bool flipX = false;
     bool flipY = false;
@@ -96,14 +96,14 @@ class WicDecode {
   }
 }
 
-/// Convenience accessors for the size returned by [WicDecode.decodeToFile].
+/// Convenience accessors for the size returned by [WicDecode.decodeImageToRawPixelFile].
 extension WicDecodeSize on Map<String, dynamic> {
   int get width => this['width'] as int;
   int get height => this['height'] as int;
   int get orientation => (this['orientation'] as int?) ?? 1;
 }
 
-Future<ui.Image> _decodeWicRawPixelFile({
+Future<ui.Image> _decodeRawPixelFileToUIImage({
   required String filePath,
   required int width,
   required int height,

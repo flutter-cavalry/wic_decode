@@ -88,7 +88,7 @@ class _MyAppState extends State<MyApp> {
     }
     setState(() => _status = 'Decoding...');
     try {
-      final result = await _wicDecodePlugin.decodeToFile(
+      final result = await _wicDecodePlugin.decodeImageToRawPixelFile(
         srcImage: _srcPath,
         destFile: _destPath,
         outWidth: width,
@@ -100,7 +100,7 @@ class _MyAppState extends State<MyApp> {
       final imageHeight = result.height;
       final orientation = result.orientation;
 
-      final image = await _wicDecodePlugin.decodeWicRawPixelFile(
+      final image = await _wicDecodePlugin.decodeRawPixelFileToUIImage(
         filePath: _destPath,
         width: imageWidth,
         height: imageHeight,
@@ -170,7 +170,7 @@ class _MyAppState extends State<MyApp> {
                 Text(_status),
                 const SizedBox(height: 12),
                 if (_decodedImage != null)
-                  Expanded(child: WicDecode.buildImageView(_decodedImage!, _orientation)),
+                  Expanded(child: WicDecode.buildImageViewFromUIImage(_decodedImage!, _orientation)),
               ],
             ),
           ),

@@ -67,7 +67,7 @@ std::string WideToUtf8(const std::wstring &input) {
   return result;
 }
 
-bool DecodeToFile(const std::string &srcImage, const std::string &destFile,
+bool DecodeImageToRawPixelFile(const std::string &srcImage, const std::string &destFile,
                   bool hasSize, int outWidth, int outHeight,
                   int &resultWidth, int &resultHeight,
                   int &resultOrientation,
@@ -264,7 +264,7 @@ WicDecodePlugin::~WicDecodePlugin() {}
 void WicDecodePlugin::HandleMethodCall(
     const flutter::MethodCall<flutter::EncodableValue> &method_call,
     std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result) {
-  if (method_call.method_name().compare("decodeToFile") == 0) {
+  if (method_call.method_name().compare("decodeImageToRawPixelFile") == 0) {
     const auto *args =
         std::get_if<flutter::EncodableMap>(method_call.arguments());
     if (!args) {
@@ -330,7 +330,7 @@ void WicDecodePlugin::HandleMethodCall(
       int resultWidth = 0;
       int resultHeight = 0;
       int resultOrientation = 1;
-      if (DecodeToFile(srcImage, destFile, hasSize, outWidth, outHeight,
+      if (DecodeImageToRawPixelFile(srcImage, destFile, hasSize, outWidth, outHeight,
                        resultWidth, resultHeight, resultOrientation, error)) {
         flutter::EncodableMap result_map;
         result_map[flutter::EncodableValue(std::string("width"))] =

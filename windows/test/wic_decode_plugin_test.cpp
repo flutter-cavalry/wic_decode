@@ -39,14 +39,14 @@ TEST(WicDecodePlugin, NotImplementedForUnknownMethod) {
   EXPECT_TRUE(not_implemented);
 }
 
-TEST(WicDecodePlugin, DecodeToFileRequiresArguments) {
+TEST(WicDecodePlugin, DecodeImageToRawPixelFileRequiresArguments) {
   WicDecodePlugin plugin;
   std::string error_code;
   std::mutex m;
   std::condition_variable cv;
   bool done = false;
   plugin.HandleMethodCall(
-      MethodCall("decodeToFile", std::make_unique<EncodableValue>(EncodableMap{})),
+      MethodCall("decodeImageToRawPixelFile", std::make_unique<EncodableValue>(EncodableMap{})),
       std::make_unique<MethodResultFunctions<>>(
           [&done, &cv](const EncodableValue*) {
             done = true;
@@ -68,7 +68,7 @@ TEST(WicDecodePlugin, DecodeToFileRequiresArguments) {
   EXPECT_EQ(error_code, "invalid_arguments");
 }
 
-TEST(WicDecodePlugin, DecodeToFileRequiresBothDimensions) {
+TEST(WicDecodePlugin, DecodeImageToRawPixelFileRequiresBothDimensions) {
   WicDecodePlugin plugin;
   EncodableMap args;
   args[EncodableValue(std::string("srcImage"))] = EncodableValue(std::string("src"));
@@ -79,7 +79,7 @@ TEST(WicDecodePlugin, DecodeToFileRequiresBothDimensions) {
   std::condition_variable cv;
   bool done = false;
   plugin.HandleMethodCall(
-      MethodCall("decodeToFile", std::make_unique<EncodableValue>(args)),
+      MethodCall("decodeImageToRawPixelFile", std::make_unique<EncodableValue>(args)),
       std::make_unique<MethodResultFunctions<>>(
           [&done, &cv](const EncodableValue*) {
             done = true;
@@ -101,7 +101,7 @@ TEST(WicDecodePlugin, DecodeToFileRequiresBothDimensions) {
   EXPECT_EQ(error_code, "invalid_arguments");
 }
 
-TEST(WicDecodePlugin, DecodeToFileWritesRawPixels) {
+TEST(WicDecodePlugin, DecodeImageToRawPixelFileWritesRawPixels) {
   char tempPath[MAX_PATH];
   GetTempPathA(MAX_PATH, tempPath);
   std::string src = std::string(tempPath) + "wic_test_src.bmp";
@@ -145,7 +145,7 @@ TEST(WicDecodePlugin, DecodeToFileWritesRawPixels) {
   bool done = false;
   bool ok = false;
   plugin.HandleMethodCall(
-      MethodCall("decodeToFile", std::make_unique<EncodableValue>(args)),
+      MethodCall("decodeImageToRawPixelFile", std::make_unique<EncodableValue>(args)),
       std::make_unique<MethodResultFunctions<>>(
           [&ok, &done, &cv](const EncodableValue*) {
             ok = true;

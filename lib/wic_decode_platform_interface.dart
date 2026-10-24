@@ -23,12 +23,12 @@ abstract class WicDecodePlatform extends PlatformInterface {
     _instance = instance;
   }
 
-  Future<Map<String, dynamic>> decodeToFile({
+  Future<Map<String, dynamic>> decodeImageToRawPixelFile({
     required String srcImage,
     required String destFile,
     int? outWidth,
     int? outHeight,
   }) {
-    throw UnimplementedError('decodeToFile() has not been implemented.');
+    throw UnimplementedError('decodeImageToRawPixelFile() has not been implemented.');
   }
 }
