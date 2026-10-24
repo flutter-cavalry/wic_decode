@@ -19,11 +19,11 @@ void main() {
       'iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAHklEQVQI12P4'
       '//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==',
     ));
-    await plugin.decodeToFile(srcImage: src.path, destFile: dest.path);
+    await plugin.decodeImageToRawPixelFile(srcImage: src.path, destFile: dest.path);
     expect(dest.existsSync(), isTrue);
     expect(dest.lengthSync() > 0, isTrue);
 
-    await plugin.decodeToFile(
+    await plugin.decodeImageToRawPixelFile(
       srcImage: src.path,
       destFile: p.join(dir.path, 'wic_integration_resized.raw'),
       outWidth: 2,
@@ -40,10 +40,10 @@ void main() {
       '//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==',
     ));
 
-    final size = await plugin.decodeToFile(srcImage: src.path, destFile: dest.path);
+    final size = await plugin.decodeImageToRawPixelFile(srcImage: src.path, destFile: dest.path);
     expect(size.width, 4);
     expect(size.height, 4);
-    final image = await plugin.decodeWicRawPixelFile(
+    final image = await plugin.decodeRawPixelFileToUIImage(
       filePath: dest.path,
       width: size.width,
       height: size.height,
@@ -53,7 +53,7 @@ void main() {
     image.dispose();
 
     final resizedDest = File(p.join(dir.path, 'wic_raw_resized.raw'));
-    final resizedSize = await plugin.decodeToFile(
+    final resizedSize = await plugin.decodeImageToRawPixelFile(
       srcImage: src.path,
       destFile: resizedDest.path,
       outWidth: 2,
@@ -61,7 +61,7 @@ void main() {
     );
     expect(resizedSize.width, 2);
     expect(resizedSize.height, 2);
-    final resizedImage = await plugin.decodeWicRawPixelFile(
+    final resizedImage = await plugin.decodeRawPixelFileToUIImage(
       filePath: resizedDest.path,
       width: resizedSize.width,
       height: resizedSize.height,
