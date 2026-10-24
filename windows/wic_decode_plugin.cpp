@@ -15,6 +15,7 @@
 #include <wrl/client.h>
 
 #include <algorithm>
+#include <cmath>
 #include <filesystem>
 #include <fstream>
 #include <memory>
@@ -166,6 +167,13 @@ bool DecodeImageToRawPixelFile(const std::string &srcImage, const std::string &d
       break;
     }
 
+    UINT srcWidth = 0;
+    UINT srcHeight = 0;
+    if (FAILED(converter->GetSize(&srcWidth, &srcHeight))) {
+      error = "Failed to get image size.";
+      break;
+    }
+
     ComPtr<IWICBitmapSource> source = converter;
 
     if (hasSize) {
@@ -173,20 +181,36 @@ bool DecodeImageToRawPixelFile(const std::string &srcImage, const std::string &d
         error = "Invalid output size.";
         break;
       }
-      ComPtr<IWICBitmapScaler> scaler;
-      hr = factory->CreateBitmapScaler(&scaler);
-      if (FAILED(hr)) {
-        error = "Failed to create bitmap scaler.";
-        break;
+      UINT targetWidth = srcWidth;
+      UINT targetHeight = srcHeight;
+      if (srcWidth > 0 && srcHeight > 0) {
+        const double scaleX = static_cast<double>(outWidth) / srcWidth;
+        const double scaleY = static_cast<double>(outHeight) / srcHeight;
+        const double scale = (std::min)(scaleX, scaleY);
+        if (scale < 1.0) {
+          targetWidth = static_cast<UINT>(std::lround(srcWidth * scale));
+          targetHeight = static_cast<UINT>(std::lround(srcHeight * scale));
+          if (targetWidth < 1) targetWidth = 1;
+          if (targetHeight < 1) targetHeight = 1;
+          while (targetWidth > static_cast<UINT>(outWidth)) targetWidth--;
+          while (targetHeight > static_cast<UINT>(outHeight)) targetHeight--;
+        }
       }
-      hr = scaler->Initialize(converter.Get(), static_cast<UINT>(outWidth),
-                              static_cast<UINT>(outHeight),
-                              WICBitmapInterpolationModeFant);
-      if (FAILED(hr)) {
-        error = "Failed to scale image.";
-        break;
+      if (targetWidth != srcWidth || targetHeight != srcHeight) {
+        ComPtr<IWICBitmapScaler> scaler;
+        hr = factory->CreateBitmapScaler(&scaler);
+        if (FAILED(hr)) {
+          error = "Failed to create bitmap scaler.";
+          break;
+        }
+        hr = scaler->Initialize(converter.Get(), targetWidth, targetHeight,
+                                WICBitmapInterpolationModeFant);
+        if (FAILED(hr)) {
+          error = "Failed to scale image.";
+          break;
+        }
+        source = scaler;
       }
-      source = scaler;
     }
 
     UINT width = 0;
