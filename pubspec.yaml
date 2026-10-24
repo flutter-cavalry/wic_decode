@@ -1,6 +1,6 @@
 name: wic_decode
 description: "A Flutter plugin for decoding images on Windows using Windows Imaging Component (WIC), including EXIF orientation."
-version: 0.2.0
+version: 0.2.1
 homepage: https://github.com/flutter-cavalry/wic_decode
 
 environment:

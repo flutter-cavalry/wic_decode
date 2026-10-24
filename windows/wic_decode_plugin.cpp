@@ -209,7 +209,24 @@ bool DecodeImageToRawPixelFile(const std::string &srcImage, const std::string &d
           error = "Failed to scale image.";
           break;
         }
-        source = scaler;
+        // IWICBitmapScaler always emits 32bppBGRA regardless of the source
+        // pixel format, so wrap it in a format converter to restore the
+        // 32bppRGBA layout the rest of the pipeline (and Dart) expects.
+        ComPtr<IWICFormatConverter> scaledConverter;
+        hr = factory->CreateFormatConverter(&scaledConverter);
+        if (FAILED(hr)) {
+          error = "Failed to create format converter.";
+          break;
+        }
+        hr = scaledConverter->Initialize(
+            scaler.Get(), GUID_WICPixelFormat32bppRGBA,
+            WICBitmapDitherTypeNone, nullptr, 0.0,
+            WICBitmapPaletteTypeMedianCut);
+        if (FAILED(hr)) {
+          error = "Failed to convert scaled image.";
+          break;
+        }
+        source = scaledConverter;
       }
     }
 
